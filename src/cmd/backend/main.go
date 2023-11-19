@@ -8,7 +8,6 @@ import (
 	"github.com/EasyCode-Platform/app-backend/src/driver/postgres"
 	"github.com/EasyCode-Platform/app-backend/src/router"
 	"github.com/EasyCode-Platform/app-backend/src/storage"
-	"github.com/EasyCode-Platform/app-backend/src/utils/accesscontrol"
 	"github.com/EasyCode-Platform/app-backend/src/utils/config"
 	"github.com/EasyCode-Platform/app-backend/src/utils/cors"
 	"github.com/EasyCode-Platform/app-backend/src/utils/logger"
@@ -57,14 +56,8 @@ func initServer() (*Server, error) {
 	// init driver
 	storage := initStorage(globalConfig, sugaredLogger)
 
-	// init attribute group
-	attrg, errInNewAttributeGroup := accesscontrol.NewRawAttributeGroup()
-	if errInNewAttributeGroup != nil {
-		return nil, errInNewAttributeGroup
-	}
-
 	// init controller
-	c := controller.NewControllerForBackend(storage, validator, attrg)
+	c := controller.NewControllerForBackend(storage, validator)
 	router := router.NewRouter(c)
 	server := NewServer(globalConfig, engine, router, sugaredLogger)
 	return server, nil

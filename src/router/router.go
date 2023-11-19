@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/EasyCode-Platform/app-backend/src/controller"
-	"github.com/EasyCode-Platform/app-backend/src/utils/remotejwtauth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +23,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	routerGroup := engine.Group("/api/v1")
 
 	// builderRouter := routerGroup.Group("/teams/:teamID/builder")
-	appRouter := routerGroup.Group("/teams/:teamID/apps")
+	postgresRouter := routerGroup.Group("/postgres")
 	// appsRouter := routerGroup.Group("/apps")
 	// publicAppRouter := routerGroup.Group("/teams/byIdentifier/:teamIdentifier/publicApps")
 	// resourceRouter := routerGroup.Group("/teams/:teamID/resources")
@@ -35,20 +34,11 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// statusRouter := routerGroup.Group("/status")
 	// oauth2Router := routerGroup.Group("/oauth2")
 
-	// // register auth
-	// builderRouter.Use(remotejwtauth.RemoteJWTAuth())
-	appRouter.Use(remotejwtauth.RemoteJWTAuth())
-	// appsRouter.Use(remotejwtauth.RemoteJWTAuth())
-	// roomRouter.Use(remotejwtauth.RemoteJWTAuth())
-	// actionRouter.Use(remotejwtauth.RemoteJWTAuth())
-	// internalActionRouter.Use(remotejwtauth.RemoteJWTAuth())
-	// resourceRouter.Use(remotejwtauth.RemoteJWTAuth())
-
 	// // builder routers
 	// builderRouter.GET("/desc", r.Controller.GetTeamBuilderDesc)
 
 	// // app routers
-	appRouter.POST("", r.Controller.CreateApp)
+	postgresRouter.POST(":sql", r.Controller.ExecuteSql)
 	// appRouter.DELETE(":appID", r.Controller.DeleteApp)
 	// appRouter.PATCH(":appID/config", r.Controller.ConfigApp)
 	// appRouter.GET("", r.Controller.GetAllApps)
