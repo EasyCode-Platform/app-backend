@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"fmt"
+
 	"github.com/EasyCode-Platform/app-backend/src/request"
 	"github.com/EasyCode-Platform/app-backend/src/response"
 	"go.uber.org/zap"
@@ -19,10 +21,13 @@ func NewPostgresStorage(logger *zap.SugaredLogger, db *gorm.DB) *PostgresStorage
 	}
 }
 
-func (storage *Storage) ExecutePostgresSql(sql *request.ExecuteSqlRequest) *response.SqlResponse {
+func (impl *PostgresStorage) ExecutePostgresSql(sql *request.ExecuteSqlRequest) (*response.SqlResponse, error) {
 	var ans interface{}
-	storage.PostgresStorage.db.Raw(sql.SqlStatement, sql.SqlValues).Scan(&ans)
-	storage.PostgresStorage.logger.Info("return from storage.ExecutePostgresSql:{:?}", ans)
-	print("return from storage.ExecutePostgresSql:{:?}", ans)
-	return response.NewSqlResponse(ans)
+	err := impl.db.Raw(sql.SqlStatement, sql.SqlValues).Scan(&ans).Error
+	if err != nil {
+		impl.logger.Errorf("Failed to execute sql %+v with error %+v", sql, err)
+	}
+	impl.logger.Infof("return from storage.ExecutePostgresSql: %+v", ans)
+	fmt.Printf("return from storage.ExecutePostgresSql %+v", ans)
+	return response.NewSqlResponse(ans), nil
 }

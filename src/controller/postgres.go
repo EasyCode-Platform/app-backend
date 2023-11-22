@@ -16,12 +16,12 @@ func (controller *Controller) ExecutePostgresSql(c *gin.Context) {
 	for _, str := range rawStatements {
 		_, err := sqlparser.Parse(str)
 		if err != nil {
-			controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence  error: "+err.Error())
+			controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence error: "+err.Error())
 			return
 		}
 	}
 	if err != nil {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence  error: "+err.Error())
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence error: "+err.Error())
 		return
 	}
 	var executeSqlRequest *request.ExecuteSqlRequest
@@ -31,7 +31,10 @@ func (controller *Controller) ExecutePostgresSql(c *gin.Context) {
 	{
 		executeSqlRequest = request.NewExecuteSqlRequest(rawStatement)
 	}
-	sqlResponse := controller.Storage.ExecutePostgresSql(executeSqlRequest)
+	sqlResponse, err := controller.Storage.PostgresStorage.ExecutePostgresSql(executeSqlRequest)
+	if err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence error: "+err.Error())
+	}
 	controller.FeedbackOK(c, sqlResponse)
 }
 

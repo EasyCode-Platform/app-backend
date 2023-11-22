@@ -13,7 +13,7 @@ import (
 const RETRY_TIMES = 6
 
 type PostgresConfig struct {
-	Addr     string `env:"PG_ADDR" envDefault:"ec-postgres"`
+	Addr     string `env:"PG_ADDR" envDefault:"app-postgres"`
 	Port     string `env:"PG_PORT" envDefault:"5433"`
 	User     string `env:"PG_USER" envDefault:"ec_cloud"`
 	Password string `env:"PG_PASSWORD" envDefault:"ec2022"`
@@ -44,7 +44,7 @@ func NewPostgresConnection(config *PostgresConfig, logger *zap.SugaredLogger) (*
 
 	for err != nil {
 		if logger != nil {
-			logger.Errorw("Failed to connect to postgres database, %d", retries)
+			logger.Errorf("Failed to connect to postgres database, %d with error %s", retries, err)
 		}
 		if retries > 1 {
 			retries--

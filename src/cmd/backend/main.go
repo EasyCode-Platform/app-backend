@@ -65,7 +65,7 @@ func initServer() (*Server, error) {
 }
 
 func (server *Server) Start() {
-	server.logger.Infow("Starting ec-builder-backend...")
+	server.logger.Infow("Starting app-builder-backend...")
 
 	// init
 	gin.SetMode(gin.ReleaseMode)
@@ -75,7 +75,7 @@ func (server *Server) Start() {
 	server.engine.Use(cors.Cors())
 	server.router.RegisterRouters(server.engine)
 	// run
-	server.logger.Infow("ec-builder-backend started")
+	server.logger.Infow("app-builder-backend started")
 	err := server.engine.Run(server.config.ServerHost + ":" + server.config.ServerPort)
 	if err != nil {
 		server.logger.Errorw("Error in startup", "err", err)

@@ -15,6 +15,5 @@ type MongoDbStorage struct {
 // @param collection
 // @return *MongoDbStorage
 func NewMongoDb(logger *zap.SugaredLogger, db *mongo.Database) *MongoDbStorage {
-
 	return &MongoDbStorage{logger: logger, db: db}
 }

@@ -68,8 +68,8 @@ type Config struct {
 	DriveAccessKeySecret  string `env:"DRIVE_ACCESS_KEY_SECRET"  envDefault:""`
 	DriveRegion           string `env:"DRIVE_REGION"             envDefault:""`
 	DriveEndpoint         string `env:"DRIVE_ENDPOINT"           envDefault:""`
-	DriveSystemBucketName string `env:"DRIVE_SYSTEM_BUCKET_NAME" envDefault:"ec-cloud"`
-	DriveTeamBucketName   string `env:"DRIVE_TEAM_BUCKET_NAME"   envDefault:"ec-cloud-team"`
+	DriveSystemBucketName string `env:"DRIVE_SYSTEM_BUCKET_NAME" envDefault:"app-cloud"`
+	DriveTeamBucketName   string `env:"DRIVE_TEAM_BUCKET_NAME"   envDefault:"app-cloud-team"`
 	DriveUploadTimeoutRaw string `env:"DRIVE_UPLOAD_TIMEOUT"     envDefault:"30s"`
 	DriveUploadTimeout    time.Duration
 	// supervisor API
@@ -78,10 +78,10 @@ type Config struct {
 	// peripheral API
 	ecPeripheralAPI string `env:"PERIPHERAL_API" envDefault:"https://peripheral-api.ecsoft.com/v1/"`
 	// resource manager API
-	ecResourceManagerRestAPI         string `env:"RESOURCE_MANAGER_API"     envDefault:"http://ec-resource-manager-backend:8006"`
-	ecResourceManagerInternalRestAPI string `env:"RESOURCE_MANAGER_INTERNAL_API"     envDefault:"http://ec-resource-manager-backend-internal:9004"`
+	ecResourceManagerRestAPI         string `env:"RESOURCE_MANAGER_API"     envDefault:"http://app-resource-manager-backend:8006"`
+	ecResourceManagerInternalRestAPI string `env:"RESOURCE_MANAGER_INTERNAL_API"     envDefault:"http://app-resource-manager-backend-internal:9004"`
 	// ec marketplace config
-	ecMarketplaceInternalRestAPI string `env:"MARKETPLACE_INTERNAL_API"     envDefault:"http://ec-marketplace-backend-internal:9003/api/v1"`
+	ecMarketplaceInternalRestAPI string `env:"MARKETPLACE_INTERNAL_API"     envDefault:"http://app-marketplace-backend-internal:9003/api/v1"`
 	// token for internal api
 	ControlToken string `env:"CONTROL_TOKEN"     envDefault:""`
 	// google config
