@@ -17,7 +17,7 @@ const RETRY_TIMES = 6
 type MongodbConfig struct {
 	Addr          string `env:"MONGODB_ADDR" envDefault:"localhost"`
 	Port          string `env:"MONGODB_PORT" envDefault:"27017"`
-	Database      string `env:"MONGODB_DATABASE" envDefault:"ec_backend"`
+	Database      string `env:"MONGODB_DATABASE" envDefault:"app_backend"`
 	MaxCollection int64  `env:"MONGODB_MAXCOLLECTION" envDefault:"10"`
 }
 

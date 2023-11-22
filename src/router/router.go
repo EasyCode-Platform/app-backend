@@ -38,7 +38,8 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// builderRouter.GET("/desc", r.Controller.GetTeamBuilderDesc)
 
 	// // app routers
-	postgresRouter.POST(":sql", r.Controller.ExecuteSql)
+	postgresRouter.POST(":sql", r.Controller.ExecutePostgresSql)
+	postgresRouter.POST(":sql", r.Controller.ValidatePostgresSql)
 	// appRouter.DELETE(":appID", r.Controller.DeleteApp)
 	// appRouter.PATCH(":appID/config", r.Controller.ConfigApp)
 	// appRouter.GET("", r.Controller.GetAllApps)

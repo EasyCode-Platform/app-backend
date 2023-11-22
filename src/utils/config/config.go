@@ -37,29 +37,25 @@ func GetInstance() *Config {
 
 type Config struct {
 	// server config
-	ServerHost                    string `env:"SERVER_HOST"                    envDefault:"0.0.0.0"`
-	ServerPort                    string `env:"SERVER_PORT"                    envDefault:"8003"`
-	InternalServerPort            string `env:"SERVER_INTERNAL_PORT"           envDefault:"9005"`
-	ServerMode                    string `env:"SERVER_MODE"                    envDefault:"release"`
-	DeployMode                    string `env:"DEPLOY_MODE"                    envDefault:"self-host"`
-	SecretKey                     string `env:"SECRET_KEY"                     envDefault:"8xEMrWkBARcDDYQ"`
-	WebsocketServerHost           string `env:"WEBSOCKET_SERVER_HOST"          envDefault:"0.0.0.0"`
-	WebsocketServerPort           string `env:"WEBSOCKET_SERVER_PORT"          envDefault:"8002"`
-	WebsocketServerConnectionHost string `env:"WEBSOCKET_CONNECTION_HOST"      envDefault:"0.0.0.0"`
-	WebsocketServerConnectionPort string `env:"WEBSOCKET_CONNECTION_PORT"      envDefault:"80"`
-	WSSEnabled                    string `env:"WSS_ENABLED"                    envDefault:"false"`
+	ServerHost         string `env:"SERVER_HOST"                    envDefault:"0.0.0.0"`
+	ServerPort         string `env:"SERVER_PORT"                    envDefault:"8003"`
+	InternalServerPort string `env:"SERVER_INTERNAL_PORT"           envDefault:"9005"`
+	ServerMode         string `env:"SERVER_MODE"                    envDefault:"release"`
+	DeployMode         string `env:"DEPLOY_MODE"                    envDefault:"self-host"`
+	SecretKey          string `env:"SECRET_KEY"                     envDefault:"8xEMrWkBARcDDYQ"`
+	WSSEnabled         string `env:"WSS_ENABLED"                    envDefault:"false"`
 
 	// key for idconvertor
 	RandomKey string `env:"RANDOM_KEY"  envDefault:"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"`
 	// storage config
 	PostgresAddr         string `env:"PG_ADDR" envDefault:"localhost"`
 	PostgresPort         string `env:"PG_PORT" envDefault:"5432"`
-	PostgresUser         string `env:"PG_USER" envDefault:"ec_backend"`
+	PostgresUser         string `env:"PG_USER" envDefault:"app_backend"`
 	PostgresPassword     string `env:"PG_PASSWORD" envDefault:"scut2023"`
-	PostgresDatabase     string `env:"PG_DATABASE" envDefault:"ec_backend"`
+	PostgresDatabase     string `env:"PG_DATABASE" envDefault:"app_backend"`
 	MongodbAddr          string `env:"MONGODB_ADDR" envDefault:"localhost"`
 	MongodbPort          string `env:"MONGODB_PORT" envDefault:"27017"`
-	MongodbDatabase      string `env:"MONGODB_DATABASE" envDefault:"ec_backend"`
+	MongodbDatabase      string `env:"MONGODB_DATABASE" envDefault:"app_backend"`
 	MongodbMaxCollection int64  `env:"MONGODB_MAXCOLLECTION" envDefault:"10"`
 	// cache config
 	RedisAddr     string `env:"REDIS_ADDR" envDefault:"localhost"`
@@ -133,14 +129,6 @@ func (c *Config) IsCloudBetaMode() bool {
 
 func (c *Config) IsCloudProductionMode() bool {
 	return c.DeployMode == DEPLOY_MODE_CLOUD_PRODUCTION
-}
-
-func (c *Config) GetWebScoketServerListenAddress() string {
-	return c.WebsocketServerHost + ":" + c.WebsocketServerPort
-}
-
-func (c *Config) GetWebScoketServerConnectionAddress() string {
-	return c.WebsocketServerConnectionHost + ":" + c.WebsocketServerConnectionPort
 }
 
 func (c *Config) GetWebsocketProtocol() string {

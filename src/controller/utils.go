@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -12,35 +11,7 @@ import (
 )
 
 const (
-	PARAM_AUTHORIZATION    = "Authorization"
-	PARAM_REQUEST_TOKEN    = "Request-Token"
-	PARAM_TEAM_ID          = "teamID"
-	PARAM_USER_ID          = "userID"
-	PARAM_TARGET_USER_ID   = "targetUserID"
-	PARAM_TEAM_IDENTIFIER  = "teamIdentifier"
-	PARAM_USER_ROLE        = "userRole"
-	PARAM_INVITE_LINK_HASH = "inviteLinkHash"
-	PARAM_UNIT_TYPE        = "unitType"
-	PARAM_UNIT_ID          = "unitID"
-	PARAM_ATTRIBUTE_ID     = "attributeID"
-	PARAM_FROM_ID          = "fromID"
-	PARAM_TO_ID            = "toID"
-	PARAM_ACTION_ID        = "actionID"
-	PARAM_APP_ID           = "appID"
-	PARAM_VERSION          = "version"
-	PARAM_RESOURCE_ID      = "resourceID"
-	PARAM_PAGE_LIMIT       = "pageLimit"
-	PARAM_PAGE             = "page"
-	PARAM_SNAPSHOT_ID      = "snapshotID"
-	PARAM_STATE            = "state"
-	PARAM_CODE             = "code"
-	PARAM_ERROR            = "error"
-	PARAM_ACCESS_TOKEN     = "accessToken"
-	PARAM_SORT_BY          = "sortBy"
-	PARAM_LIMIT            = "limit"
-	PARAM_KEYWORDS         = "keywords"
-	PARAM_TO_TEAM_ID       = "toTeamID"
-	PARAM_FORK_TO          = "forkTo"
+	PARAM_SQL_STATEMENT = "sql_statement"
 )
 
 const (
@@ -165,56 +136,6 @@ var SKIPPING_MAGIC_ID = map[string]int{
 	"-1": -1,
 	"-2": -2,
 	"-3": -3,
-}
-
-func (controller *Controller) GetUserAuthTokenFromHeader(c *gin.Context) (string, error) {
-	// fetch token
-	rawToken := c.Request.Header[PARAM_AUTHORIZATION]
-	if len(rawToken) != 1 {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "HTTP request header missing request token.")
-		return "", errors.New("missing request token.")
-	}
-	var token string
-	token = rawToken[0]
-	return token, nil
-}
-
-func (controller *Controller) ValidateRequestTokenFromHeader(c *gin.Context, input ...string) (bool, error) {
-	// fetch token
-	rawToken := c.Request.Header[PARAM_REQUEST_TOKEN]
-	if len(rawToken) != 1 {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "HTTP request header missing request token.")
-		return false, errors.New("missing request token.")
-	}
-	var token string
-	token = rawToken[0]
-	// validate
-	tokenShouldBe := controller.RequestTokenValidator.GenerateValidateTokenBySliceParam(input)
-	if token != tokenShouldBe {
-		log.Println("Illegal internal request token detected: \"" + token + "\", the token should be: \"" + tokenShouldBe + "\"")
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "request token mismatch.")
-		return false, errors.New("request token mismatch.")
-	}
-	return true, nil
-}
-
-func (controller *Controller) ValidateRequestTokenFromHeaderByStringMap(c *gin.Context, input []string) (bool, error) {
-	// fetch token
-	rawToken := c.Request.Header[PARAM_REQUEST_TOKEN]
-	if len(rawToken) != 1 {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "HTTP request header missing request token.")
-		return false, errors.New("missing request token.")
-	}
-	var token string
-	token = rawToken[0]
-	// validate
-	tokenShouldBe := controller.RequestTokenValidator.GenerateValidateTokenBySliceParam(input)
-	if token != tokenShouldBe {
-		log.Println("Illegal internal request token detected: \"" + token + "\", the token should be: \"" + tokenShouldBe + "\"")
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "request token mismatch.")
-		return false, errors.New("request token mismatch.")
-	}
-	return true, nil
 }
 
 func (controller *Controller) GetStringFromFormData(c *gin.Context, paramName string) (string, error) {

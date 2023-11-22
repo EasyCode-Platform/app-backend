@@ -7,8 +7,8 @@ import (
 )
 
 type Storage struct {
-	ComponentStorage *ComponentStorage
-	AppStorage       *AppStorage
+	MongodbStorage  *MongoDbStorage
+	PostgresStorage *PostgresStorage
 	// ActionStorage      *ActionStorage
 	// AppSnapshotStorage *AppSnapshotStorage
 	// KVStateStorage     *KVStateStorage
@@ -24,8 +24,8 @@ type Storage struct {
 // @return *Storage
 func NewStorage(postgresDriver *gorm.DB, mongodb *mongo.Database, logger *zap.SugaredLogger) *Storage {
 	return &Storage{
-		ComponentStorage: NewComponentStorage(logger, mongodb),
-		AppStorage:       NewAppStorage(logger, postgresDriver),
+		MongodbStorage:  NewMongoDb(logger, mongodb),
+		PostgresStorage: NewPostgresStorage(logger, postgresDriver),
 		// ActionStorage:      NewActionStorage(logger, postgresDriver),
 		// AppSnapshotStorage: NewAppSnapshotStorage(logger, postgresDriver),
 		// KVStateStorage:     NewKVStateStorage(logger, postgresDriver),
