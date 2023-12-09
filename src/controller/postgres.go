@@ -89,8 +89,12 @@ func (controller *Controller) RemoveRecord(c *gin.Context) {
 }
 
 func (controller *Controller) DisplayTable(c *gin.Context) {
-	tableName := c.Request.Context().Value("tableName").(string)
-	ans, err := controller.Storage.PostgresStorage.DisplayTable(tableName)
+	table := request.DisplayRecordRequest{}
+	if err := c.ShouldBind(&table); err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_TABLE_LIST_FAILED, "Failed to retrieve table colums from request error:"+err.Error())
+		return
+	}
+	ans, err := controller.Storage.PostgresStorage.DisplayTable(table.TableName)
 	if err != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_DISPLAY_RECORD_FAILED, "Failed to retrieve all records error:"+err.Error())
 		return
