@@ -10,3 +10,5 @@ grant all privileges on database app_backend to app_backend;
 CREATE EXTENSION pg_trgm;
 
 CREATE EXTENSION btree_gin;
+
+GRANT USAGE, CREATE ON SCHEMA public TO app_backend;
