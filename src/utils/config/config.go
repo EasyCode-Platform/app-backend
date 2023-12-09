@@ -64,12 +64,11 @@ type Config struct {
 	RedisDatabase int    `env:"REDIS_DATABASE" envDefault:"0"`
 	// drive config
 	DriveType             string `env:"DRIVE_TYPE"               envDefault:""`
-	DriveAccessKeyID      string `env:"DRIVE_ACCESS_KEY_ID"      envDefault:""`
-	DriveAccessKeySecret  string `env:"DRIVE_ACCESS_KEY_SECRET"  envDefault:""`
+	DriveAccessKeyID      string `env:"DRIVE_ACCESS_KEY_ID"      envDefault:"root"`
+	DriveAccessKeySecret  string `env:"DRIVE_ACCESS_KEY_SECRET"  envDefault:"scut2023"`
 	DriveRegion           string `env:"DRIVE_REGION"             envDefault:""`
-	DriveEndpoint         string `env:"DRIVE_ENDPOINT"           envDefault:""`
-	DriveSystemBucketName string `env:"DRIVE_SYSTEM_BUCKET_NAME" envDefault:"app-cloud"`
-	DriveTeamBucketName   string `env:"DRIVE_TEAM_BUCKET_NAME"   envDefault:"app-cloud-team"`
+	DriveEndpoint         string `env:"DRIVE_ENDPOINT"           envDefault:"localhost:9000"`
+	DriveImageBucketName  string `env:"DRIVE_IMAGE_BUCKET_NAME"  envDefault:"image"`
 	DriveUploadTimeoutRaw string `env:"DRIVE_UPLOAD_TIMEOUT"     envDefault:"30s"`
 	DriveUploadTimeout    time.Duration
 	// supervisor API
@@ -223,12 +222,8 @@ func (c *Config) GetAWSS3Region() string {
 	return c.DriveRegion
 }
 
-func (c *Config) GetAWSS3SystemBucketName() string {
-	return c.DriveSystemBucketName
-}
-
-func (c *Config) GetAWSS3TeamBucketName() string {
-	return c.DriveTeamBucketName
+func (c *Config) GetAWSS3ImageBucketName() string {
+	return c.DriveImageBucketName
 }
 
 func (c *Config) GetAWSS3Timeout() time.Duration {
@@ -247,12 +242,8 @@ func (c *Config) GetMINIOEndpoint() string {
 	return c.DriveEndpoint
 }
 
-func (c *Config) GetMINIOSystemBucketName() string {
-	return c.DriveSystemBucketName
-}
-
-func (c *Config) GetMINIOTeamBucketName() string {
-	return c.DriveTeamBucketName
+func (c *Config) GetMINIOImageBucketName() string {
+	return c.DriveImageBucketName
 }
 
 func (c *Config) GetMINIOTimeout() time.Duration {

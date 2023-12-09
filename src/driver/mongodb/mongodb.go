@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"fmt"
+	"time"
 
 	// "time"
 
@@ -34,30 +35,30 @@ func NewMongodbConnectionByGlobalConfig(config *config.Config, logger *zap.Sugar
 func NewMongodbConnection(config *MongodbConfig, logger *zap.SugaredLogger) (*mongo.Database, error) {
 	var client *mongo.Client
 	var err error
-	// retries := RETRY_TIMES
+	retries := RETRY_TIMES
 	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", config.Addr, config.Port))
 	logger.Infow("trying to connect to", "url", clientOptions.GetURI())
 	clientOptions.SetMaxPoolSize(uint64(config.MaxCollection))
-	// var timeout time.Duration = time.Duration(time.Duration.Seconds(10)) // 设置10秒的超时时间
-	// ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	// defer cancel()
+	var timeout time.Duration = time.Duration(time.Duration.Seconds(10)) // 设置10秒的超时时间
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 	client, err = mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		logger.Errorw("Failed to connect to mongodb database")
-		return nil, err
-	}
-	// for err != nil {
-	// 	if logger != nil {
-	// 		logger.Errorw("Failed to connect to mongodb database, %d", retries)
-	// 	}
-	// 	if retries > 1 {
-	// 		retries--
-	// 		time.Sleep(10 * time.Second)
-	// 		client, err = mongo.Connect(ctx, clientOptions)
-	// 		continue
-	// 	}
-	// 	panic(err)
+	// if err != nil {
+	// 	logger.Errorw("Failed to connect to mongodb database")
+	// 	return nil, err
 	// }
+	for err != nil {
+		if logger != nil {
+			logger.Errorw("Failed to connect to mongodb database, %d", retries)
+		}
+		if retries > 1 {
+			retries--
+			time.Sleep(10 * time.Second)
+			client, err = mongo.Connect(ctx, clientOptions)
+			continue
+		}
+		panic(err)
+	}
 	err = client.Ping(context.TODO(), nil)
 
 	if err != nil {
