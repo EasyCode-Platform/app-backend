@@ -28,6 +28,10 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	//relational database request routers
 	postgresRouter.POST("/excecute/:sql", r.Controller.ExecutePostgresSql)
 	postgresRouter.POST("/validate/:sql", r.Controller.ValidatePostgresSql)
+	postgresRouter.POST("/createTable", r.Controller.CreateTable)
+	postgresRouter.POST("/insert", r.Controller.InsertRecord)
+	postgresRouter.POST("/records", r.Controller.DisplayTable)
+	postgresRouter.POST("/remove", r.Controller.RemoveRecord)
 
 	//image router
 	imageRouter.POST("/upload", r.Controller.UploadImage)

@@ -17,7 +17,9 @@ const (
 const (
 	SUCCESS_FLAG = "SUCCESSFULLY REQUESTED"
 	// request error
-	ERROR_FLAG_PARSE_REQUEST_FILE_FAILED = "ERROR_FLAG_PARSE_REQUEST_FILE_FAILED"
+	ERROR_FLAG_PARSE_REQUEST_FILE_FAILED  = "ERROR_FLAG_PARSE_REQUEST_FILE_FAILED"
+	ERROR_FLAG_PARSE_TABLE_LIST_FAILED    = "ERROR_FLAG_PARSE_TABLE_LIST_FAILED"
+	ERROR_FLAG_PARSE_RECORDREQUEST_FAILED = "ERROR_FLAG_PARSE_RECORDREQUEST_FAILED"
 	// validate failed
 	ERROR_FLAG_VALIDATE_ACCOUNT_FAILED                  = "ERROR_FLAG_VALIDATE_ACCOUNT_FAILED"
 	ERROR_FLAG_VALIDATE_REQUEST_BODY_FAILED             = "ERROR_FLAG_VALIDATE_REQUEST_BODY_FAILED"
@@ -114,7 +116,10 @@ const (
 	ERROR_FLAG_EXECUTE_ACTION_FAILED         = "ERROR_FLAG_EXECUTE_ACTION_FAILED"
 	ERROR_FLAG_GENERATE_SQL_FAILED           = "ERROR_FLAG_GENERATE_SQL_FAILED"
 	ERROR_FLAG_UPLOAD_IMAGE_FAILED           = "ERROR_FLAG_UPLOAD_IMAGE_FAILED"
-
+	ERROR_FLAG_CREATE_TABLE_FAILED           = "ERROR_FLAG_CREATE_TABLE_FAILED"
+	ERROR_FLAG_RECORD_TYPE_ERROR             = "ERROR_FLAG_RECORD_TYPE_ERROR"
+	ERROR_FLAG_INSERT_RECORD_FAILED          = "ERROR_FLAG_INSERT_RECORD_FAILED"
+	ERROR_FLAG_DISPLAY_RECORD_FAILED         = "ERROR_FLAG_DISPLAY_RECORD_FAILED"
 	// internal failed
 	ERROR_FLAG_BUILD_TEAM_MEMBER_LIST_FAILED = "ERROR_FLAG_BUILD_TEAM_MEMBER_LIST_FAILED"
 	ERROR_FLAG_BUILD_TEAM_CONFIG_FAILED      = "ERROR_FLAG_BUILD_TEAM_CONFIG_FAILED"
@@ -348,13 +353,22 @@ func (controller *Controller) GetUserIDFromAuth(c *gin.Context) (int, error) {
 // @param c
 // @param resp
 func (controller *Controller) FeedbackOK(c *gin.Context, resp response.Response) {
+	if resp != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"Code":    200,
+			"Flag":    SUCCESS_FLAG,
+			"Message": "success",
+			"data":    resp.ExportForFeedback(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"errorCode":    200,
-		"errorFlag":    SUCCESS_FLAG,
-		"errorMessage": "success",
-		"data":         resp.ExportForFeedback(),
+		"Code":    200,
+		"Flag":    SUCCESS_FLAG,
+		"Message": "success",
+		"data":    "",
 	})
-	return
+
 }
 
 // FeedbackCreated
@@ -364,10 +378,10 @@ func (controller *Controller) FeedbackOK(c *gin.Context, resp response.Response)
 func (controller *Controller) FeedbackCreated(c *gin.Context, resp response.Response) {
 	if resp != nil {
 		c.JSON(http.StatusCreated, gin.H{
-			"errorCode":    201,
-			"errorFlag":    SUCCESS_FLAG,
-			"errorMessage": "success",
-			"data":         resp.ExportForFeedback(),
+			"Code":    201,
+			"Flag":    SUCCESS_FLAG,
+			"Message": "success",
+			"data":    resp.ExportForFeedback(),
 		})
 		return
 	}
@@ -378,14 +392,14 @@ func (controller *Controller) FeedbackCreated(c *gin.Context, resp response.Resp
 // FeedbackBadRequest
 // @receiver controller
 // @param c
-// @param errorFlag
-// @param errorMessage
-func (controller *Controller) FeedbackBadRequest(c *gin.Context, errorFlag string, errorMessage string) {
+// @param Flag
+// @param Message
+func (controller *Controller) FeedbackBadRequest(c *gin.Context, Flag string, Message string) {
 	c.JSON(http.StatusBadRequest, gin.H{
-		"errorCode":    400,
-		"errorFlag":    errorFlag,
-		"errorMessage": errorMessage,
-		"data":         "",
+		"Code":    400,
+		"Flag":    Flag,
+		"Message": Message,
+		"data":    "",
 	})
 	return
 }
@@ -393,14 +407,14 @@ func (controller *Controller) FeedbackBadRequest(c *gin.Context, errorFlag strin
 // FeedbackBadRequest
 // @receiver controller
 // @param c
-// @param errorFlag
-// @param errorMessage
-func (controller *Controller) FeedbackBadRequestWithResponse(c *gin.Context, errorFlag string, errorMessage string, res response.Response) {
+// @param Flag
+// @param Message
+func (controller *Controller) FeedbackBadRequestWithResponse(c *gin.Context, Flag string, Message string, res response.Response) {
 	c.JSON(http.StatusBadRequest, gin.H{
-		"errorCode":    400,
-		"errorFlag":    errorFlag,
-		"errorMessage": errorMessage,
-		"data":         res.ExportForFeedback(),
+		"Code":    400,
+		"Flag":    Flag,
+		"Message": Message,
+		"data":    res.ExportForFeedback(),
 	})
 	return
 }
@@ -417,14 +431,14 @@ func (controller *Controller) FeedbackRedirect(c *gin.Context, uri string) {
 // FeedbackInternalServerError
 // @receiver controller
 // @param c
-// @param errorFlag
-// @param errorMessage
-func (controller *Controller) FeedbackInternalServerError(c *gin.Context, errorFlag string, errorMessage string) {
+// @param Flag
+// @param Message
+func (controller *Controller) FeedbackInternalServerError(c *gin.Context, Flag string, Message string) {
 	c.JSON(http.StatusInternalServerError, gin.H{
-		"errorCode":    500,
-		"errorFlag":    errorFlag,
-		"errorMessage": errorMessage,
-		"data":         "",
+		"Code":    500,
+		"Flag":    Flag,
+		"Message": Message,
+		"data":    "",
 	})
 	return
 }
