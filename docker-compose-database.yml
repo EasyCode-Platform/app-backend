@@ -1,3 +1,23 @@
+version: 'latest' # 所有容器通用的设置和配置
+x-minio-common: &minio-common
+  image: minio/minio
+  command: server --console-address ":9001" http://minio{1...4}/data
+  expose:
+    - "9000"
+  environment:
+    MINIO_ROOT_USER: root
+    MINIO_ROOT_PASSWORD: scut2023
+  healthcheck:
+    test:
+      [
+        "CMD",
+        "curl",
+        "-f",
+        "http://localhost:9000/minio/health/live"
+      ]
+    interval: 30s
+    timeout: 20s
+    retries: 3
 services:
   # easycode_backend:
   #   network_mode: host
@@ -10,7 +30,7 @@ services:
   #     # - app-redis
   #     - app-mongodb
   app-postgres:
-    network_mode: host
+    hostname: postgres
     image: postgres:latest
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
@@ -25,7 +45,7 @@ services:
   #   ports:
   #     - 6379:6379
   app-mongodb:
-    network_mode: host
+    hostname: mongodb
     image: mongo:latest
     restart: on-failure
     ports:
@@ -36,3 +56,44 @@ services:
       - ./docker-manifest/mongodb/mongo-init:/docker-entrypoint-initdb.d
       - ./data/mongodb-data:/data/db
       - ./data/mongodb-log:/var/log/mongodb
+  minio1:
+    <<: *minio-common
+    hostname: minio1
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./data/data1:/data
+  minio2:
+    <<: *minio-common
+    hostname: minio2
+    ports:
+      - "9002:9001"
+    volumes:
+      - ./data/data2:/data
+  minio3:
+    <<: *minio-common
+    hostname: minio3
+    ports:
+      - "9003:9001"
+    volumes:
+      - ./data/data3:/data
+  minio4:
+    <<: *minio-common
+    hostname: minio4
+    ports:
+      - "9004:9001"
+    volumes:
+      - ./data/data4:/data
+
+  nginx:
+    image: nginx:stable-alpine
+    hostname: nginx
+    volumes:
+      - ./docker-manifest/nginx-config/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9000:9000"
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4

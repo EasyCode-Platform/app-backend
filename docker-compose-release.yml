@@ -21,7 +21,7 @@ x-minio-common: &minio-common
 services:
   app_backend:
     restart: on-failure
-    build: .
+    image: chichenn/easycode_app:latest
     ports:
       - 8003:8003
     depends_on:

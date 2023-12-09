@@ -6,7 +6,7 @@ import (
 	"github.com/xwb1989/sqlparser"
 )
 
-func (controller *Controller) ExecutePostgresSql(c *gin.Context) {
+func (controller *Controller) ExecuteMongodbSql(c *gin.Context) {
 	rawStatement := c.Request.Context().Value("sqlStatement").(string)
 	rawStatements, err := sqlparser.SplitStatementToPieces(rawStatement)
 	if err != nil {
@@ -31,32 +31,9 @@ func (controller *Controller) ExecutePostgresSql(c *gin.Context) {
 	{
 		executeSqlRequest = request.NewExecuteSqlRequest(rawStatement)
 	}
-	sqlResponse, err := controller.Storage.PostgresStorage.ExecutePostgresSql(executeSqlRequest)
+	sqlResponse, err := controller.Storage.MongodbStorage.ExecuteMongodbSql(executeSqlRequest)
 	if err != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence error: "+err.Error())
 	}
 	controller.FeedbackOK(c, sqlResponse)
-}
-
-func (controller *Controller) ValidatePostgresSql(c *gin.Context) {
-	rawStatement := c.Request.Context().Value("sqlStatement").(string)
-	rawStatements, err := sqlparser.SplitStatementToPieces(rawStatement)
-	if err != nil {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence  error: "+err.Error())
-		return
-	}
-	for _, str := range rawStatements {
-		_, err := sqlparser.Parse(str)
-		if err != nil {
-			controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence  error: "+err.Error())
-			return
-		}
-	}
-	if err != nil {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_SQL_INVALID, "validate sql sentence  error: "+err.Error())
-		return
-	}
-}
-func (controller *Controller) CreateTable(c *gin.Context) {
-
 }

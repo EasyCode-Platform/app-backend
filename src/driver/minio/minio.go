@@ -2,83 +2,90 @@ package minio
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/EasyCode-Platform/app-backend/src/utils/config"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"go.uber.org/zap"
 )
 
 type MINIOConfig struct {
-	AccessKeyID     string
-	AccessKeySecret string
-	Endpoint        string
-	BucketName      string
-	SSLEnabled      bool
-	UploadTimeout   time.Duration
+	AccessKeyID      string
+	AccessKeySecret  string
+	Endpoint         string
+	BucketName       string
+	SSLEnabled       bool
+	UploadTimeout    time.Duration
+	MakeBucketOption minio.MakeBucketOptions
+	PutObjectOption  minio.PutObjectOptions
 }
 
-func NewSystemMINIOConfigByGlobalConfig(config *config.Config) *MINIOConfig {
+func NewImageMINIOConfigByGlobalConfig(config *config.Config) *MINIOConfig {
 	return &MINIOConfig{
-		AccessKeyID:     config.GetMINIOAccessKeyID(),
-		AccessKeySecret: config.GetMINIOAccessKeySecret(),
-		Endpoint:        config.GetMINIOEndpoint(),
-		BucketName:      config.GetMINIOSystemBucketName(),
-		UploadTimeout:   config.GetMINIOTimeout(),
+		AccessKeyID:      config.GetMINIOAccessKeyID(),
+		AccessKeySecret:  config.GetMINIOAccessKeySecret(),
+		Endpoint:         config.GetMINIOEndpoint(),
+		BucketName:       config.GetMINIOImageBucketName(),
+		UploadTimeout:    config.GetMINIOTimeout(),
+		MakeBucketOption: minio.MakeBucketOptions{},
+		PutObjectOption:  minio.PutObjectOptions{},
 	}
 }
 
-func NewTeamMINIOConfigByGlobalConfig(config *config.Config) *MINIOConfig {
-	return &MINIOConfig{
-		AccessKeyID:     config.GetMINIOAccessKeyID(),
-		AccessKeySecret: config.GetMINIOAccessKeySecret(),
-		Endpoint:        config.GetMINIOEndpoint(),
-		BucketName:      config.GetMINIOTeamBucketName(),
-		UploadTimeout:   config.GetMINIOTimeout(),
-	}
-}
-
-func CreateMINIOInstance(minioConfig *MINIOConfig) *minio.Client {
+func CreateMINIOInstance(minioConfig *MINIOConfig) (*minio.Client, error) {
 	minioInstance, err := minio.New(minioConfig.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(minioConfig.AccessKeyID, minioConfig.AccessKeySecret, ""),
 		Secure: minioConfig.SSLEnabled,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
-	return minioInstance
+	return minioInstance, nil
 }
 
 type S3Drive struct {
 	Instance *minio.Client
 	Config   *MINIOConfig
+	logger   *zap.SugaredLogger
 }
 
-func NewS3Drive(minioConfig *MINIOConfig) *S3Drive {
+func NewS3Drive(logger *zap.SugaredLogger, minioConfig *MINIOConfig) (*S3Drive, error) {
 	s3Drive := &S3Drive{
 		Config: minioConfig,
+		logger: logger,
 	}
-	s3Drive.Instance = CreateMINIOInstance(minioConfig)
-	s3Drive.initDefaultBucket()
-	return s3Drive
+	var err error
+	s3Drive.Instance, err = CreateMINIOInstance(minioConfig)
+	if err != nil {
+		logger.Errorf("Failed to Create Minio Instance with error : %s", err)
+		return nil, err
+	}
+	err = s3Drive.initDefaultBucket()
+	if err != nil {
+		logger.Errorf("Failed to init Default Bucket with error : %s", err)
+		return nil, err
+	}
+	return s3Drive, nil
 }
 
-func (s3Drive *S3Drive) initDefaultBucket() {
+func (s3Drive *S3Drive) initDefaultBucket() error {
 	ctx := context.Background()
 	bucketName := s3Drive.Config.BucketName
-	err := s3Drive.Instance.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
+	err := s3Drive.Instance.MakeBucket(ctx, bucketName, s3Drive.Config.MakeBucketOption)
 	if err != nil {
 		// Check to see if we already own this bucket (which happens if you run this twice)
 		exists, errBucketExists := s3Drive.Instance.BucketExists(ctx, bucketName)
 		if errBucketExists == nil && exists {
-			log.Printf("We already own bucket \"%s\"\n", bucketName)
+			s3Drive.logger.Infof("We already own bucket \"%s\"\n", bucketName)
 		} else {
-			log.Fatalln(err)
+			s3Drive.logger.Errorf("Failed to make bucket : %s with error: %s", bucketName, err)
+			return err
 		}
 	} else {
-		log.Printf("Successfully created bucket \"%s\"\n", bucketName)
+		s3Drive.logger.Infof("Successfully created bucket \"%s\"\n", bucketName)
 	}
+	return nil
 }
 
 func (s3Drive *S3Drive) GetPreSignedPutURL(fileName string) (string, error) {

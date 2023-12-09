@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/EasyCode-Platform/app-backend/src/controller"
+	"github.com/EasyCode-Platform/app-backend/src/driver/minio"
 	"github.com/EasyCode-Platform/app-backend/src/driver/mongodb"
 	"github.com/EasyCode-Platform/app-backend/src/driver/postgres"
 	"github.com/EasyCode-Platform/app-backend/src/router"
@@ -42,7 +43,11 @@ func initStorage(globalConfig *config.Config, logger *zap.SugaredLogger) *storag
 	if err != nil {
 		logger.Errorw("Error in startup, mongodb init failed")
 	}
-	return storage.NewStorage(postgresDriver, mongodbDriver, logger)
+	imageS3Drive, err := minio.NewS3Drive(logger, minio.NewImageMINIOConfigByGlobalConfig(globalConfig))
+	if err != nil {
+		logger.Errorw("Error in startup, imageS3Drive init failed")
+	}
+	return storage.NewStorage(postgresDriver, mongodbDriver, imageS3Drive, logger)
 }
 
 func initServer() (*Server, error) {

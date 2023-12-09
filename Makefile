@@ -5,6 +5,9 @@ all: build
 docker-build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" ./src/cmd/backend/main.go
 
+docker-image:
+	docker build -t chichenn/easycode_app:latest .
+
 docker-run:
 	docker compose -f ./docker-compose.yml up
 
